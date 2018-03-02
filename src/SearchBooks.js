@@ -14,21 +14,25 @@ class SearchBooks extends Component {
     updateQuery = (query) => {
         this.setState({ query: query })
        // console.log(this.state.books)
+
     }
 
 
     render(){
 
-        const { onChangeToShelf } = this.props
+        const { books, onChangeToShelf } = this.props
         const { query, booksSt, hasError } = this.state
 
-        //console.log(booksSt)
+        
+        
 
         let showingBooks
         if (query) {
             const match = new RegExp(escapeRegExp(query), 'i')
             BooksAPI.search(query).then((books)=> 
-                    this.setState({ booksSt: books, hasError: false  }),
+                    // books.map((book,i)=> book.title === this.props.books[i].title ? book[i] = this.props.books[i] : book),
+                    
+                    this.setState({ booksSt: this.props.books.concat(books) , hasError: false  }),
                     showingBooks = booksSt.filter((book) => match.test(book.title))
             ).catch((err) => { 
                 //console.log("no results!")
@@ -40,7 +44,7 @@ class SearchBooks extends Component {
 
         } else {
             showingBooks = []
-        }
+        }  
 
         return(
             <div>
@@ -75,23 +79,20 @@ class SearchBooks extends Component {
                  )}
                 <div className="search-books-results">
                     
-                        {/* <ListBooks books={showingBooks} onChangeToShelf={this.changeToShelf} shelfStatus="wantToRead"/> */}
-
                      <ol className="books-grid">
-
-                    {showingBooks.map((book) => (
+                    {showingBooks.map((book,idx) => (  
                         <li key={book.id}>
+                            {/* {console.log(book)} */}
                             <div className="book">
                                 <div className="book-top">
                                 <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks !== 'undefined' ? book.imageLinks.thumbnail : '' })` }}></div>
                                 <div className="book-shelf-changer">
-                                    {/* {console.log(book)} */}
-                                    <select value="none" onChange={(event)=> onChangeToShelf(book, event.target.value)}>  
+                                    <select value={book.shelf ? book.shelf : "noneOpt"} onChange={(event)=> onChangeToShelf(book, event.target.value)}>  
                                         <option value="none" disabled>Move to...</option>
                                         <option value="currentlyReading">Currently Reading</option>
                                         <option value="wantToRead">Want to Read</option>
                                         <option value="read">Read</option>
-                                        <option value="none">None</option>
+                                        <option value="noneOpt">None</option>
                                     </select>
                                 </div>
                                 </div>
@@ -99,6 +100,7 @@ class SearchBooks extends Component {
                                 <div className="book-authors">{book.authors ? book.authors.map((author)=>( author )) : '' }</div>
                             </div>
                         </li>
+                        
                     ))}
 
                     </ol>

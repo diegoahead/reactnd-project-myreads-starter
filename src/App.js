@@ -30,6 +30,7 @@ class BooksApp extends React.Component {
         this.setState({ books: books })
       )
     })
+    console.log(this)
   }
 
   render() {
